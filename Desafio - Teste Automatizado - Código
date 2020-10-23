@@ -1,0 +1,252 @@
+#Autor: Charles Modesto
+
+ Feature: Compra no Site Submarino
+
+  @busca 
+	Scenario: Busca por Produto
+		Given que acesso site do Submarino
+		When preencho o termo "smartphone" e clico na Lupa 
+		When exibe a lista de produtos 
+		Then clico no primeiro produto da lista
+		Then valido produto no carrinho com sucesso
+		
+	
+==========================================================================================================
+
+package busca; // Pacote, ele é um agrupador de classes ELE FORMA AS PASTAS 
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+import java.text.SimpleDateFormat;
+// TODOS ESSES "IMPORT" SEVEM PARA TRANSFERIR OS COMANDOS,
+//ELAS COMPARTILHAM CAPACIDADE E HABILIDADE DE EXECUTAR VARIAS TAREFAS
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+
+
+public class BuscaSubmarino {
+	String url;
+	WebDriver driver;
+	
+	String nomePasta = new SimpleDateFormat("yyyy-MM-dd HH-mm").format(Calendar.getInstance().getTime());
+
+	// Funções e metodo de apoio
+
+	// Tirar Print da Tela
+	// 2° PARTE VEM OS MÉTODOS SERVE MAIS PARA PODER SEPARAR
+	public void Print(String nomePrint) throws IOException {
+		File foto = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		FileUtils.copyFile(foto, new File("C:\\Users\\danielly\\eclipse-workspace-Test\\Submarino\\target\\prints\\"
+				+ nomePasta + "\\" + nomePrint + ".png"));
+	}
+
+	@Before  
+	public void Iniciar() {
+		url = "https://www.submarino.com.br";
+		System.setProperty("webdriver.chrome.driver",
+				"C:\\Users\\danielly\\eclipse-workspace-Test\\Submarino\\drivers\\chrome\\84\\chromedriver.exe");
+		driver = new ChromeDriver();
+		
+		driver.manage().timeouts().implicitlyWait(10000, TimeUnit.MILLISECONDS);
+		
+		driver.manage().window().maximize();
+	}
+
+	@After
+	public void Finalizar() {
+		driver.quit();
+	}
+
+	@Given("^que acesso site do Submarino$")
+	public void que_acesso_site_do_Submarino() throws Throwable {
+		driver.get(url);
+		Print("Passo 1- Acessou o site do Submarino");
+		
+
+	}
+
+	@When("^preencho o termo \"([^\"]*)\" e clico na Lupa$")
+	public void preencho_o_termo_e_clico_na_Lupa(String termo) throws Throwable {
+		driver.findElement(By.id("h_search-input")).clear();
+		driver.findElement(By.id("h_search-input")).sendKeys(termo);
+		Print("Passo 2- Preencheu o termo de Busca");
+		driver.findElement(By.id("h_search-input")).sendKeys(Keys.ENTER);
+
+		
+	}
+
+	@Then("^exibe a lista de produtos$")
+	public void exibe_a_lista_de_produtos() throws Throwable {
+		Thread.sleep(6000);
+		assertEquals("Smartphone com Ofertas Incríveis no Submarino.com", driver.getTitle());
+		Print("Passo 3 - Exibiu a lista de produtos");
+
+		
+	}
+
+	@Then("^clico no primeiro produto da lista$")
+	public void clico_no_primeiro_produto_da_lista() throws Throwable {
+
+		driver.findElement(By.xpath("//img[@alt='Smartphone Samsung Galaxy A30s 64GB Dual Chip Android 9.0 Tela 6.4\""
+				+ " Octa-Core 4G Câmera Tripla 25MP + 5MP + 8MP - Preto']")).click();
+
+		assertTrue(driver.findElement(By.id("product-name-default")).getText().contains(
+				"Smartphone Samsung Galaxy A30s 64GB Dual Chip Android 9.0 Tela 6.4\" Octa-Core 4G Câmera Tripla 25MP + 5MP + 8MP - Preto"));
+
+
+		Print("Passo 4 - Escolheu o primeiro da lista de produtos");
+		
+		
+	}
+
+	
+	@Then("^valido produto no carrinho com sucesso$")
+	public void valido_produto_no_carrinho_com_sucesso() throws Throwable {
+
+		driver.findElement(By.xpath("//div[@class='Wrapper-sc-1i9za0i-3 hyuQAM ViewUI-sc-1ijittn-6 iXIDWU']")).click();
+
+		driver.findElement(By.id("btn-continue")).click();
+
+		Print("Passo 5 - Validou produto no carrinho");
+		
+			}
+
+	
+}
+
+==============================================================================================================================================
+
+PomXml
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.iterasys</groupId>
+  <artifactId>Submarino</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.5.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/info.cukes/cucumber-java -->
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/info.cukes/cucumber-junit -->
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-junit</artifactId>
+			<version>1.2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>2.22.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-failsafe-plugin</artifactId>
+			<version>2.22.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.vimalselvam/cucumber-extentsreport -->
+		<dependency>
+			<groupId>com.vimalselvam</groupId>
+			<artifactId>cucumber-extentsreport</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.vimalselvam/cucumber-extentsreport -->
+		<!-- https://mvnrepository.com/artifact/com.aventstack/extentreports -->
+		<dependency>
+			<groupId>com.aventstack</groupId>
+			<artifactId>extentreports</artifactId>
+			<version>3.0.7</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/info.cukes/cucumber-picocontainer -->
+		<dependency>
+			<groupId>info.cukes</groupId>
+			<artifactId>cucumber-picocontainer</artifactId>
+			<version>1.2.5</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.28</version>
+		</dependency>
+
+
+
+
+	</dependencies>
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.1</version>
+				<configuration>
+					<!-- <testClassesDirectory>s360UIAutomationCC/src/main/java</testClassesDirectory> -->
+					<testSourceDirectory>Submarino/src/test/java</testSourceDirectory>
+					<includes>
+						<include>**/*Runner.java</include>
+					</includes>
+					<!-- <excludes> <exclude>**/*RunCukesTest.java</exclude> </excludes> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+
+
+</project>
+	        
