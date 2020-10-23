@@ -1,4 +1,5 @@
-#  1- Entre em um portal de comércio online  ( Submarino)
+#  Desafio QA - Automatização
+1- Entre em um portal de comércio online  ( Submarino)
 2- Faça uma busca por um produto
 3- Valide o retorno da busca
 4- Escolha um produto na lista
